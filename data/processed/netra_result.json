@@ -1,0 +1,141 @@
+{
+    "system": "NETRA",
+    "purpose": "Investigative Decision Support",
+    "entity_matches": [
+        {
+            "entity_1": "P001",
+            "entity_2": "P003",
+            "score": 90.0,
+            "name_similarity": 0.75,
+            "phone_match": true,
+            "vehicle_match": true,
+            "location_match": true
+        },
+        {
+            "entity_1": "P002",
+            "entity_2": "P002",
+            "score": 100.0,
+            "name_similarity": 1.0,
+            "phone_match": true,
+            "vehicle_match": true,
+            "location_match": true
+        }
+    ],
+    "network_insights": [
+        {
+            "entity": "P002",
+            "degree_centrality": 0.6,
+            "betweenness_centrality": 0.6,
+            "connections": 3
+        },
+        {
+            "entity": "P001",
+            "degree_centrality": 0.4,
+            "betweenness_centrality": 0.6,
+            "connections": 2
+        },
+        {
+            "entity": "P003",
+            "degree_centrality": 0.4,
+            "betweenness_centrality": 0.4,
+            "connections": 2
+        },
+        {
+            "entity": "P004",
+            "degree_centrality": 0.4,
+            "betweenness_centrality": 0.0,
+            "connections": 2
+        },
+        {
+            "entity": "P006",
+            "degree_centrality": 0.4,
+            "betweenness_centrality": 0.0,
+            "connections": 2
+        },
+        {
+            "entity": "P005",
+            "degree_centrality": 0.2,
+            "betweenness_centrality": 0.0,
+            "connections": 1
+        }
+    ],
+    "anomalies": [
+        {
+            "transaction_id": "T006",
+            "sender": "P001",
+            "receiver": "P002",
+            "amount": 950000.0,
+            "status": "ANOMALY"
+        }
+    ],
+    "lead_scores": [
+        {
+            "entity": "P001",
+            "score": 55,
+            "priority": "MEDIUM",
+            "reasons": [
+                "Connected to multiple entities",
+                "Associated with an anomalous transaction"
+            ],
+            "evidence_gaps": [
+                "Transaction anomaly detected, but intent is not established"
+            ]
+        },
+        {
+            "entity": "P002",
+            "score": 85,
+            "priority": "HIGH",
+            "reasons": [
+                "High number of network connections",
+                "Associated with an anomalous transaction",
+                "Appears across multiple cases"
+            ],
+            "evidence_gaps": [
+                "Transaction anomaly detected, but intent is not established"
+            ]
+        },
+        {
+            "entity": "P003",
+            "score": 25,
+            "priority": "LOW",
+            "reasons": [
+                "Connected to multiple entities"
+            ],
+            "evidence_gaps": [
+                "No transaction anomaly observed"
+            ]
+        },
+        {
+            "entity": "P004",
+            "score": 25,
+            "priority": "LOW",
+            "reasons": [
+                "Connected to multiple entities"
+            ],
+            "evidence_gaps": [
+                "No transaction anomaly observed"
+            ]
+        },
+        {
+            "entity": "P005",
+            "score": 5,
+            "priority": "LOW",
+            "reasons": [],
+            "evidence_gaps": [
+                "No transaction anomaly observed",
+                "Limited network connections"
+            ]
+        },
+        {
+            "entity": "P006",
+            "score": 25,
+            "priority": "LOW",
+            "reasons": [
+                "Connected to multiple entities"
+            ],
+            "evidence_gaps": [
+                "No transaction anomaly observed"
+            ]
+        }
+    ]
+}
