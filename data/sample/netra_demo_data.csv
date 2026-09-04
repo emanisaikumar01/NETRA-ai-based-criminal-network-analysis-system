@@ -1,0 +1,7 @@
+person_id,name,phone,vehicle,location,case_id
+P001,Ravi Kumar,9876500011,TS09AB1234,Jubilee Hills,C1042
+P002,Suresh Reddy,9876500022,TS09CD5678,Banjara Hills,C1042
+P003,Ravi K,9876500011,TS09AB1234,Jubilee Hills,C0817
+P004,Arjun Rao,9876500044,TS09EF1111,Madhapur,C1042
+P005,Meena Das,9876500055,TS09GH2222,Kukatpally,C0817
+P006,Rahul Verma,9876500066,TS09IJ3333,Madhapur,C0562
