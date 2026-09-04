@@ -2,121 +2,151 @@ import pandas as pd
 from difflib import SequenceMatcher
 
 
+# ---------------------------------------------------------
+# NAME SIMILARITY
+# ---------------------------------------------------------
+
 def name_similarity(name1, name2):
-    """Calculate similarity between two names."""
+    """
+    Calculate similarity between two names.
+    Returns a value between 0 and 1.
+    """
+
+    name1 = str(name1).lower().strip()
+    name2 = str(name2).lower().strip()
+
     return SequenceMatcher(
         None,
-        name1.lower().strip(),
-        name2.lower().strip()
+        name1,
+        name2
     ).ratio()
 
 
+# ---------------------------------------------------------
+# COMPARE TWO ENTITIES
+# ---------------------------------------------------------
+
 def compare_entities(entity1, entity2):
     """
-    Compare two entity records using multiple signals.
-
-    Returns a match score and an explanation of the matching signals.
+    Compare two entities using:
+    - Name similarity
+    - Phone number
+    - Vehicle number
+    - Location
     """
 
-    name_score = name_similarity(entity1["name"], entity2["name"])
+    name_sim = name_similarity(
+        entity1["name"],
+        entity2["name"]
+    )
 
     phone_match = (
-        entity1["phone"] == entity2["phone"]
-        and entity1["phone"] != ""
+        str(entity1["phone"]).strip()
+        == str(entity2["phone"]).strip()
     )
 
     vehicle_match = (
-        entity1["vehicle"] == entity2["vehicle"]
-        and entity1["vehicle"] != ""
+        str(entity1["vehicle"]).strip()
+        == str(entity2["vehicle"]).strip()
     )
 
     location_match = (
-        entity1["location"].lower().strip()
-        == entity2["location"].lower().strip()
-        and entity1["location"] != ""
+        str(entity1["location"]).strip().lower()
+        == str(entity2["location"]).strip().lower()
     )
 
-    # Weighted score
+    # -----------------------------------------------------
+    # WEIGHTED MATCH SCORE
+    # -----------------------------------------------------
+
     score = (
-        0.40 * name_score
-        + 0.25 * int(phone_match)
-        + 0.20 * int(vehicle_match)
-        + 0.15 * int(location_match)
+        (name_sim * 40)
+        + (25 if phone_match else 0)
+        + (20 if vehicle_match else 0)
+        + (15 if location_match else 0)
     )
-
-    reasons = []
-
-    if name_score >= 0.80:
-        reasons.append("High name similarity")
-
-    if phone_match:
-        reasons.append("Same phone number")
-
-    if vehicle_match:
-        reasons.append("Same vehicle")
-
-    if location_match:
-        reasons.append("Same location")
 
     return {
-        "entity_1": entity1["person_id"],
-        "entity_2": entity2["person_id"],
-        "name_similarity": round(name_score, 2),
-        "phone_match": phone_match,
-        "vehicle_match": vehicle_match,
-        "location_match": location_match,
-        "match_score": round(score * 100, 2),
-        "reasons": reasons
+        "entity_1": str(entity1["person_id"]),
+        "entity_2": str(entity2["person_id"]),
+        "score": float(round(score, 2)),
+        "name_similarity": float(round(name_sim, 2)),
+        "phone_match": bool(phone_match),
+        "vehicle_match": bool(vehicle_match),
+        "location_match": bool(location_match)
     }
 
 
+# ---------------------------------------------------------
+# FIND POSSIBLE ENTITY MATCHES
+# ---------------------------------------------------------
+
 def find_possible_matches(file_path, threshold=70):
-    """Find possible duplicate/entity matches in the dataset."""
+    """
+    Compare every pair of entities and return
+    possible matches above the specified threshold.
+    """
 
     df = pd.read_csv(file_path)
 
-    results = []
+    matches = []
 
     for i in range(len(df)):
+
         for j in range(i + 1, len(df)):
 
+            entity1 = df.iloc[i]
+            entity2 = df.iloc[j]
+
             result = compare_entities(
-                df.iloc[i],
-                df.iloc[j]
+                entity1,
+                entity2
             )
 
-            if result["match_score"] >= threshold:
-                results.append(result)
+            if result["score"] >= threshold:
 
-    return results
+                matches.append(result)
 
+    return matches
+
+
+# ---------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------
 
 if __name__ == "__main__":
 
     file_path = "data/sample/netra_demo_data.csv"
 
-    matches = find_possible_matches(file_path)
+    matches = find_possible_matches(
+        file_path,
+        threshold=70
+    )
 
-    print("\n========================================")
+    print("\n" + "=" * 40)
     print("       NETRA ENTITY RESOLUTION")
-    print("========================================")
+    print("=" * 40)
 
     if not matches:
+
         print("\nNo possible entity matches found.")
 
     else:
+
         for match in matches:
 
             print("\nPossible Entity Match")
-            print("----------------------------------------")
+            print("-" * 40)
 
             print(
-                f"Entities: {match['entity_1']} ↔ "
+                f"Entities: "
+                f"{match['entity_1']} ↔ "
                 f"{match['entity_2']}"
             )
 
             print(
-                f"Match Score: {match['match_score']}/100"
+                f"Match Score: "
+                f"{match['score']}/100"
             )
 
             print(
@@ -140,8 +170,15 @@ if __name__ == "__main__":
             )
 
             print("\nWHY?")
-            for reason in match["reasons"]:
-                print(f"✓ {reason}")
+
+            if match["phone_match"]:
+                print("✓ Same phone number")
+
+            if match["vehicle_match"]:
+                print("✓ Same vehicle")
+
+            if match["location_match"]:
+                print("✓ Same location")
 
             print(
                 "\n⚠ This is a possible entity match "
