@@ -10,15 +10,6 @@
             "phone_match": true,
             "vehicle_match": true,
             "location_match": true
-        },
-        {
-            "entity_1": "P002",
-            "entity_2": "P002",
-            "score": 100.0,
-            "name_similarity": 1.0,
-            "phone_match": true,
-            "vehicle_match": true,
-            "location_match": true
         }
     ],
     "network_insights": [

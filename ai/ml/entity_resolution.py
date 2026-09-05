@@ -28,7 +28,7 @@ def name_similarity(name1, name2):
 
 def compare_entities(entity1, entity2):
     """
-    Compare two entities using:
+    Compare two unique entities using:
     - Name similarity
     - Phone number
     - Vehicle number
@@ -83,20 +83,48 @@ def compare_entities(entity1, entity2):
 
 def find_possible_matches(file_path, threshold=70):
     """
-    Compare every pair of entities and return
-    possible matches above the specified threshold.
+    Compare unique entities and return possible matches
+    above the specified threshold.
+
+    Multiple records belonging to the same person_id are
+    treated as one entity to avoid self-matching.
     """
 
     df = pd.read_csv(file_path)
 
+    # -----------------------------------------------------
+    # REMOVE DUPLICATE ENTITY RECORDS
+    # -----------------------------------------------------
+    #
+    # A person may appear in multiple cases.
+    # We only want to compare unique person IDs.
+    #
+    # Example:
+    # P002 -> C1042
+    # P002 -> C0562
+    #
+    # These are two records for the same entity, not
+    # two different entities.
+    # -----------------------------------------------------
+
+    unique_entities = (
+        df.drop_duplicates(subset=["person_id"])
+        .reset_index(drop=True)
+    )
+
     matches = []
 
-    for i in range(len(df)):
+    for i in range(len(unique_entities)):
 
-        for j in range(i + 1, len(df)):
+        for j in range(i + 1, len(unique_entities)):
 
-            entity1 = df.iloc[i]
-            entity2 = df.iloc[j]
+            entity1 = unique_entities.iloc[i]
+            entity2 = unique_entities.iloc[j]
+
+            # Extra safety check:
+            # Never compare an entity with itself.
+            if entity1["person_id"] == entity2["person_id"]:
+                continue
 
             result = compare_entities(
                 entity1,
@@ -104,7 +132,6 @@ def find_possible_matches(file_path, threshold=70):
             )
 
             if result["score"] >= threshold:
-
                 matches.append(result)
 
     return matches
