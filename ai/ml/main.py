@@ -44,7 +44,10 @@ def run_pipeline():
         threshold=70
     )
 
-    print(f"      Possible entity matches found: {len(entity_matches)}")
+    print(
+        f"      Possible entity matches found: "
+        f"{len(entity_matches)}"
+    )
 
 
     # -----------------------------------------------------
@@ -53,15 +56,26 @@ def run_pipeline():
 
     print("\n[2/4] Running Network Analysis...")
 
-    graph = build_network(str(RELATIONSHIP_FILE))
+    graph = build_network(
+        str(RELATIONSHIP_FILE)
+    )
 
     network_insights = analyze_network(graph)
 
-    print(f"      Entities in network: {graph.number_of_nodes()}")
-    print(f"      Relationships: {graph.number_of_edges()}")
+    print(
+        f"      Entities in network: "
+        f"{graph.number_of_nodes()}"
+    )
+
+    print(
+        f"      Relationships: "
+        f"{graph.number_of_edges()}"
+    )
 
     if network_insights:
+
         top_entity = network_insights[0]
+
         print(
             f"      Structurally important entity: "
             f"{top_entity['entity']}"
@@ -110,7 +124,33 @@ def run_pipeline():
         str(RELATIONSHIP_FILE)
     )
 
-    print(f"      Entities scored: {len(lead_scores)}")
+    print(
+        f"      Entities scored: "
+        f"{len(lead_scores)}"
+    )
+
+
+    # -----------------------------------------------------
+    # SUMMARY + TOP INVESTIGATIVE LEAD
+    # -----------------------------------------------------
+
+    top_lead = None
+
+    if lead_scores:
+
+        top_lead = max(
+            lead_scores,
+            key=lambda x: x["score"]
+        )
+
+
+    summary = {
+        "possible_entity_matches": len(entity_matches),
+        "network_entities": len(network_insights),
+        "relationships": graph.number_of_edges(),
+        "anomalous_transactions": len(anomalous_transactions),
+        "entities_scored": len(lead_scores)
+    }
 
 
     # -----------------------------------------------------
@@ -120,9 +160,17 @@ def run_pipeline():
     result = {
         "system": "NETRA",
         "purpose": "Investigative Decision Support",
+
+        "summary": summary,
+
+        "top_lead": top_lead,
+
         "entity_matches": entity_matches,
+
         "network_insights": network_insights,
+
         "anomalies": anomalous_transactions,
+
         "lead_scores": lead_scores
     }
 
@@ -137,13 +185,21 @@ if __name__ == "__main__":
 
     result = run_pipeline()
 
-    # Create processed directory if it doesn't exist
+
+    # -----------------------------------------------------
+    # CREATE PROCESSED DIRECTORY
+    # -----------------------------------------------------
+
     PROCESSED_DIR.mkdir(
         parents=True,
         exist_ok=True
     )
 
-    # Save final result
+
+    # -----------------------------------------------------
+    # SAVE FINAL RESULT
+    # -----------------------------------------------------
+
     with open(
         OUTPUT_FILE,
         "w",
@@ -157,6 +213,7 @@ if __name__ == "__main__":
             ensure_ascii=False
         )
 
+
     # -----------------------------------------------------
     # DISPLAY SUMMARY
     # -----------------------------------------------------
@@ -164,6 +221,7 @@ if __name__ == "__main__":
     print("\n" + "=" * 55)
     print("             NETRA PIPELINE COMPLETE")
     print("=" * 55)
+
 
     print(
         f"\nPossible Entity Matches : "
@@ -176,6 +234,11 @@ if __name__ == "__main__":
     )
 
     print(
+        f"Relationships            : "
+        f"{result['summary']['relationships']}"
+    )
+
+    print(
         f"Anomalous Transactions  : "
         f"{len(result['anomalies'])}"
     )
@@ -185,39 +248,67 @@ if __name__ == "__main__":
         f"{len(result['lead_scores'])}"
     )
 
-    # Show highest-priority investigative lead
-    if result["lead_scores"]:
 
-        top_lead = max(
-            result["lead_scores"],
-            key=lambda x: x["score"]
-        )
+    # -----------------------------------------------------
+    # DISPLAY TOP INVESTIGATIVE LEAD
+    # -----------------------------------------------------
+
+    if result["top_lead"]:
+
+        top_lead = result["top_lead"]
 
         print("\n" + "-" * 55)
         print("TOP INVESTIGATIVE LEAD")
         print("-" * 55)
 
-        print(f"Entity   : {top_lead['entity']}")
-        print(f"Priority : {top_lead['priority']}")
-        print(f"Score    : {top_lead['score']}/100")
+        print(
+            f"Entity   : "
+            f"{top_lead['entity']}"
+        )
+
+        print(
+            f"Priority : "
+            f"{top_lead['priority']}"
+        )
+
+        print(
+            f"Score    : "
+            f"{top_lead['score']}/100"
+        )
+
 
         print("\nWHY THIS LEAD?")
 
         for reason in top_lead["reasons"]:
-            print(f"  ✓ {reason}")
+
+            print(
+                f"  [+] {reason}"
+            )
+
 
         print("\nEVIDENCE GAPS")
 
         for gap in top_lead["evidence_gaps"]:
-            print(f"  ⚠ {gap}")
+
+            print(
+                f"  [!] {gap}"
+            )
+
+
+    # -----------------------------------------------------
+    # FINAL MESSAGE
+    # -----------------------------------------------------
 
     print("\n" + "-" * 55)
+
     print("Final result saved to:")
+
     print(OUTPUT_FILE)
+
     print("-" * 55)
 
     print(
-        "\n⚠ NETRA provides investigative leads, "
+        "\n[!] NETRA provides investigative leads, "
         "not determinations of guilt."
     )
 

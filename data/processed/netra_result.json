@@ -1,6 +1,26 @@
 {
     "system": "NETRA",
     "purpose": "Investigative Decision Support",
+    "summary": {
+        "possible_entity_matches": 1,
+        "network_entities": 6,
+        "relationships": 6,
+        "anomalous_transactions": 1,
+        "entities_scored": 6
+    },
+    "top_lead": {
+        "entity": "P002",
+        "score": 85,
+        "priority": "HIGH",
+        "reasons": [
+            "High number of network connections",
+            "Associated with an anomalous transaction",
+            "Appears across multiple cases"
+        ],
+        "evidence_gaps": [
+            "Transaction anomaly detected, but intent is not established"
+        ]
+    },
     "entity_matches": [
         {
             "entity_1": "P001",
